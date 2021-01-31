@@ -1,0 +1,963 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Relazione progetto di Sistemi Operativi e Laboratorio
+\end_layout
+
+\begin_layout Author
+Fausto F.
+ Frasca - 559482
+\end_layout
+
+\begin_layout Date
+A.A 2018/19
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Strutture dati di appoggio
+\end_layout
+
+\begin_layout Subsection
+Tabella hash
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tabella-hash"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+La tabella hash
+\begin_inset space ~
+\end_inset
+
+(
+\emph on
+hash.h
+\emph default
+,
+\emph on
+ hash.c
+\emph default
+) contiene tutti i nomi dei client online e le collisioni sono gestite con
+ liste di trabocco.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Si è preferita tale scelta per la rapidità garantita in media dalla tabella.
+\end_layout
+
+\begin_layout Subsection
+Statistiche
+\end_layout
+
+\begin_layout Subsubsection
+Server
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Server"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Per le statistiche del server si fa uso della struct 
+\emph on
+statistics_t
+\emph default
+
+\begin_inset space ~
+\end_inset
+
+(
+\emph on
+server_lib.h
+\emph default
+) protetta dalla mutex 
+\emph on
+mutex_stat
+\emph default
+
+\begin_inset space ~
+\end_inset
+
+(
+\emph on
+server.c
+\emph default
+).
+ Con tale struct si tiene conto di:
+\end_layout
+
+\begin_layout Itemize
+Client online
+\end_layout
+
+\begin_layout Itemize
+Dimensione della cartella data
+\end_layout
+
+\begin_layout Itemize
+Numero di oggetti salvati in data
+\end_layout
+
+\begin_layout Itemize
+Istante in cui è stato avviato il server
+\end_layout
+
+\begin_layout Itemize
+Client totali che si sono connessi al server
+\end_layout
+
+\begin_layout Standard
+Si fa uso invece di una variabile 
+\emph on
+volatile
+\emph default
+ 
+\emph on
+sig_atomic_t
+\begin_inset space ~
+\end_inset
+
+(server_lib.c)
+\emph default
+ per tener conto di quanti byte vengono scambiati tra client e server.
+\begin_inset Newline newline
+\end_inset
+
+Tale scelta è stata fatta per via del fatto che sig_atomic_t granatisce
+ che tutti i thread leggono il medesimo valore, evitando così di dover usare
+ una mutex.
+\begin_inset Newline newline
+\end_inset
+
+Poichè tale variabile va aggiornata per ogni singola lettura/scrittura sulla
+ socket si è notato che, dichiarandola in statistics_t, le eccessive lock/unlock
+ su mutex_stat peggioravano le prestazioni.
+\end_layout
+
+\begin_layout Subsubsection
+Client
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Client"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Per le statistiche del client si fa uso della struct 
+\emph on
+statistiche_t
+\emph default
+
+\begin_inset space ~
+\end_inset
+
+(
+\emph on
+client.c
+\emph default
+).
+ Con tale struct si tiene conto di:
+\end_layout
+
+\begin_layout Itemize
+Test effettuato (1 store, 2 retrieve, 3 delete)
+\end_layout
+
+\begin_layout Itemize
+Se connect e disconnect sono andate a buon fine
+\end_layout
+
+\begin_layout Itemize
+Numero di store andate a buon fine e non
+\end_layout
+
+\begin_layout Itemize
+Numero di retrieve andate a buon fine, non andate a buon fine e retrieve
+ i cui dati ricevuti non corrispondono a quelli inviati
+\end_layout
+
+\begin_layout Itemize
+Numero di delete andate a buon fine e non
+\end_layout
+
+\begin_layout Section
+Server
+\end_layout
+
+\begin_layout Standard
+L'eseguibile 
+\emph on
+server
+\emph default
+ viene compilato linkando 
+\emph on
+server.o
+\emph default
+ e la libreria statica 
+\emph on
+libServerLib.a
+\emph default
+, quest'ultima costituita da 
+\emph on
+server_lib.h
+\emph default
+ col corrispettivo file oggetto
+\begin_inset space ~
+\end_inset
+
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Server_lib.c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) e 
+\emph on
+hash.h
+\emph default
+ col corrispettivo file oggetto
+\begin_inset space ~
+\end_inset
+
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Tabella-hash"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Server.c
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Server.c"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Una volta avviato l'eseguibile, il server effettua una serie di azioni prima
+ di creare la socket e mettersi in ascolto dei client tra cui: azzerare
+ le statistiche, mascherare alcuni segnali, generare il thread handler e
+ creare la directory 
+\family typewriter
+data
+\family default
+.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Il server fa uso di una select non bloccante, in modo tale da evitare di
+ bloccarsi sulla accept e poter così controllare periodicamente la variabile
+ globale 
+\emph on
+stop
+\emph default
+, settata eventualmente dal thread handler
+\begin_inset space ~
+\end_inset
+
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Thread-handler"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ 
+\begin_inset Newline newline
+\end_inset
+
+Se la variabile risulta settata a 1, il server attende che tutti i thread
+ attivi terminino.
+ L'attesa viene interrotta non appena la variabile globale 
+\emph on
+thread_conn
+\emph default
+, che tiene conto del numero di thread attivi, diventa 0.
+\begin_inset Newline newline
+\end_inset
+
+Sia stop che thread_conn sono di tipo volatile sig_atomic_t.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Per quest'ultima è stato scelto tale tipo per motivi analoghi a quelli riportati
+ nella sezione
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Server"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Thread worker
+\end_layout
+
+\begin_layout Standard
+Tale thread viene generato non appena un client fa la connect sulla socket.
+\begin_inset Newline newline
+\end_inset
+
+Si occupa di servire un solo client e, prima di registrarlo e inserire il
+ suo nome nella tabella hash
+\begin_inset space ~
+\end_inset
+
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Tabella-hash"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), si accerta che non ci sia già un altro client connesso che abbia il medesimo
+ nome.
+\begin_inset Newline newline
+\end_inset
+
+Si appoggia alle funzioni di supporto presenti nel file 
+\emph on
+server_lib.c
+\emph default
+
+\begin_inset space ~
+\end_inset
+
+(
+\emph on
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Server_lib.c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\emph default
+) per leggere i messaggi ricevuti dal client e capire quale operazione effettuar
+e.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Se l'operazione risulta "
+\family sans
+malformed
+\family default
+" vuol dire che il messaggio ricevuto non ha riespettato il protocollo di
+ comunicazione stabilito.
+ Come conseguenza l'fd per la comunicazione sulla socket viene chiuso e
+ il thread termina.
+\begin_inset Newline newline
+\end_inset
+
+Medesima conseguenza si ha quando l'operazione risulta "
+\family sans
+break
+\family default
+".
+ In questo caso vuol dire che la read sulla socket ha restituito 0.
+\end_layout
+
+\begin_layout Subsubsection
+Thread handler
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Thread-handler"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Il thread handler viene generato dal server prima di mettersi in ascolto.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Gestisce i seguenti segnali: 
+\noun on
+SIGINT
+\noun default
+, 
+\noun on
+SIGQUIT
+\noun default
+, 
+\noun on
+SIGTSTP
+\noun default
+, 
+\noun on
+SIGTERM
+\noun default
+, 
+\noun on
+SIGALRM
+\noun default
+ e 
+\noun on
+SIGUSR1.
+\begin_inset Newline newline
+\end_inset
+
+Q
+\noun default
+uest'ultimo segnale fa stampare le statistiche del server riportate nella
+ sezione
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Server"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Gli altri invece settano la variabile globale 
+\emph on
+stop 
+\emph default
+a 1 facendo così terminare prima tutti i thread e dopo il server, come descritto
+ sopra
+\begin_inset space ~
+\end_inset
+
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Server.c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
+Server_lib.c
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Server_lib.c"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In questo file sono presenti tutte le funzioni ausiliarie necessarie per
+ il corretto funzionamento del server.
+ I prototipi delle funzioni sono riportati in server_lib.h.
+\begin_inset Newline newline
+\end_inset
+
+Di seguito viene riportata la descrizione solo delle funzioni più particolari,
+ per le altre fare affidamento ai commenti riportati nel file.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\family typewriter
+raw_msg
+\family default
+ ha il compito di leggere il messaggio del client e scomporlo, ricavandone
+ l'operazione da effettuare e gli evenutali 
+\emph on
+name,
+\emph default
+ 
+\emph on
+len 
+\emph default
+e
+\emph on
+ data
+\emph default
+.
+ Restituisce al chimante tutte le informazioni acquisite ritornando una
+ variabile di tipo 
+\emph on
+messaggio_t
+\emph default
+
+\begin_inset space ~
+\end_inset
+
+(
+\emph on
+server_lib.h
+\emph default
+).
+\begin_inset Newline newline
+\end_inset
+
+Se, durante la lettura dell'header, non vengono rispettate le condizioni
+ stabilite nel protocollo di comunicazione o viene richiesta una STORE con
+ len minore o uguale a 0, l'operazione da effettuare è settata su "
+\family sans
+malformed
+\family default
+" e in data viene riportato il messaggio da restituire al client.
+\begin_inset Newline newline
+\end_inset
+
+Se la read sulla socket restituisce 0, al chiamante viene ritornata l'operazione
+ "
+\family sans
+break
+\family default
+".
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\family typewriter
+create_directory
+\family default
+ crea una directory con i permessi di read, write e execute per owner, group
+ e others.
+ Ritorna 1 se l'operazione è andata a buon fine, 0 altrimenti.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\family typewriter
+store 
+\family default
+apre il file dichiarato in 
+\emph on
+file_name 
+\emph default
+in sola lettura.
+ Quest'ultimo viene creato se non è ancora presente nella directory, con
+ permessi in lettura e scrittura, oppure viene sovrascritto se è già presente.
+ Successivamente i dati presenti in block vengono trascritti sul file.
+\begin_inset Newline newline
+\end_inset
+
+Ritorna il messaggio da restituire al client.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+get_time ritorna il tempo in millisecondi.
+ Viene utilizzata per calcolare il delta tra l'avvio del server e quando
+ viene inviato il segnale SIGUSR1, in modo tale da sapere da quanto tempo
+ il server è attivo.
+\end_layout
+
+\begin_layout Section
+Client
+\end_layout
+
+\begin_layout Standard
+L'eseguibile 
+\emph on
+client
+\emph default
+ viene compilato linkando 
+\emph on
+client.o
+\emph default
+ e la libreria statica 
+\emph on
+libClientLib.a
+\emph default
+ , quest'ultima costituita da 
+\emph on
+client_lib.h
+\emph default
+ col corrispettivo file oggetto
+\begin_inset space ~
+\end_inset
+
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Client_lib.c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
+Client.c
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Client.c"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Il client accetta come parametri il nome da utilizzare nella connessione
+ e il numero del test da eseguire (1 store, 2 retrieve, 3 delete).
+ Una volta terminato, da in output le statistiche riguardanti l'esito delle
+ operazioni effettuate per quel determianto test.
+\begin_inset Newline newline
+\end_inset
+
+Fa uso della funzione 
+\emph on
+create_block 
+\emph default
+per creare il blocco di dati da passare sia al server per la store, sia
+ alla funzione 
+\emph on
+check_retrieve 
+\emph default
+per assicurarsi che i dati passati corrispondano.
+\begin_inset Newline newline
+\end_inset
+
+Come richiesto, la grandezza dei dati va da 100 byte a 100000 byte.
+\end_layout
+
+\begin_layout Subsection
+Client_lib.c
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Client_lib.c"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Questo file va a costituire la libreria per la comunicazione con il server.
+ Contiene tutte le funzioni richieste sfruttabili dal client.
+ 
+\begin_inset Newline newline
+\end_inset
+
+L'unica funzione di supporto alle altre è 
+\emph on
+read_write_socket.
+\begin_inset Newline newline
+\end_inset
+
+
+\emph default
+La funzione ha il compito di inviare al server in un unico blocco il messaggio
+ ricevuto e restituire la risposta al chiamante.
+ Sarà poi quest'ultimo a gestire eventuali successi o errori.
+\end_layout
+
+\begin_layout Section
+Altri file
+\end_layout
+
+\begin_layout Subsection
+Makefile
+\end_layout
+
+\begin_layout Standard
+Il makefile riporta tutti i target richiesti, oltre a quelli necessari per
+ la compilazione dei vari eseguibili e librerie.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Una volta lanciato il target 
+\emph on
+test 
+\emph default
+viene eseguito prima il target 
+\emph on
+cleandata, 
+\emph default
+che elimina la cartella 
+\family typewriter
+data
+\family default
+ e il file di log se presenti nella working directory.
+ Successivamente viene lanciato, in maniera sequenziale, il server e lo
+ script 
+\emph on
+start_test.sh
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
+Start_test.sh
+\end_layout
+
+\begin_layout Standard
+Lo script lancia i 100 client nel modo richiesto.
+ L'output di ogni client
+\begin_inset space ~
+\end_inset
+
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Client.c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) viene reindirizzatto nel file testout.log.
+\begin_inset Newline newline
+\end_inset
+
+Quando tutti i client terminano, viene lanciato lo script 
+\emph on
+testsum.sh
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
+Testsum.sh
+\end_layout
+
+\begin_layout Standard
+Lo script legge il file di log e ne estrapola le informazioni da dare in
+ output.
+ Le informazioni riportate sono le seguenti:
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Store numero di client che hanno fatto la store, store totali, store andate
+ a buon fine, store fallite, percentuale di store avvenute con successo.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Retrieve numero di client che hanno fatto la retrieve, retrieve totali,
+ retrieve andate a buon fine, retrieve fallite, retrieve i cui dati ricevuti
+ non corrispondevano ai dati passati, percentuale di retrieve avvenute con
+ successo.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Delete numero di client che hanno fatto la delete, delete totali, delete
+ andate a buon fine, delete fallite, percentuale di delete avvenute con
+ successo.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Connect numero di client che hanno fatto la connect, connect totali, connect
+ andate a buon fine, connect fallite, percentuale di connect avvenute con
+ successo.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Disconnect numero di client che hanno fatto la disconnect, disconnect totali,
+ disconnect andate a buon fine, disconnect fallite, percentuale di disconnect
+ avvenute con successo.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Totale totale client lanciati, totale operazioni effettuate, totale operazioni
+ andate a buon fine, totale operazioni non andate a buon fine, totale retrieve
+ errate, percentuale di operazioni andate a buon fine
+\end_layout
+
+\begin_layout Standard
+Una volta terminato manda al server prima SIGUSR1 e dopo SIGTERM.
+\end_layout
+
+\begin_layout Subsection
+Conn.h
+\end_layout
+
+\begin_layout Standard
+Questo file contiene le funzioni 
+\emph on
+readn
+\emph default
+ e 
+\emph on
+writen 
+\emph default
+ed è usato sia da server.c e server_lib.c che da client_lib.c.
+\begin_inset Newline newline
+\end_inset
+
+Le due funzioni sono le medesime utilizzate durante gli esercizi del corso.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Sono definiti anche il nome della socket e la struct 
+\emph on
+msg_t
+\emph default
+, usata in server_lib.c e in client_lib.c.
+\end_layout
+
+\end_body
+\end_document
